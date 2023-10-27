@@ -57,7 +57,7 @@ class MainActivity : ComponentActivity() {
         @Serializable
         data class CatApiModel(var url: String)
 
-        fun run(url: String, e: Int, entry: EntryModel) {
+        fun run(url: String, i: Int, entry: EntryModel) {
             var newEntry = entry
 
             val request = Request.Builder()
@@ -72,7 +72,7 @@ class MainActivity : ComponentActivity() {
                         }.decodeFromString<CatApiModel>(
                             response.body?.string().toString().removeSurrounding("[", "]")
                         ).url
-                        entriesList[e] = newEntry
+                        entriesList[i] = newEntry
                     }
                     catch(e: Exception) {
                         e.printStackTrace()
@@ -94,17 +94,17 @@ class MainActivity : ComponentActivity() {
                 var count = 0
                 for (e in databaseSnapshot.children) {
                     val entry = e.getValue(EntryModel::class.java)
-                    run(
-                        "https://api.thecatapi.com/v1/images/search?api_key=live_KRAgyaK4kDT8bmL6CpwExbchFaVMDYSNiOCA1eHv2Te7kiFz5S8tikKabqj9H5NA",
-                        count,
-                        entry!!
-                    )
-
                     entriesList.add(entry)
-                    count += 1
                 }
                 entriesList.sortWith(compareBy({ it?.year }, { it?.month }, { it?.day }))
                 entriesList.reverse()
+                for (i in entriesList.indices){
+                    run(
+                        "https://api.thecatapi.com/v1/images/search?api_key=live_KRAgyaK4kDT8bmL6CpwExbchFaVMDYSNiOCA1eHv2Te7kiFz5S8tikKabqj9H5NA",
+                        i,
+                        entriesList[i]!!
+                    )
+                }
             }
             Column {
                 LastEntries()
