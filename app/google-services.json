@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "502130314093",
+    "firebase_url": "https://journaal-8726c-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "journaal-8726c",
+    "storage_bucket": "journaal-8726c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:502130314093:android:add4ba9f1b4d5d76d62864",
+        "android_client_info": {
+          "package_name": "fr.onat68.journaal"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBLddskIGF7T68iMA2B9Ri6v6VyNEfjxiE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

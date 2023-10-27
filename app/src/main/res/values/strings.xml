@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Journaal</string>
+
+    <!-- Page principale -->
+    <string name="home_title">Mes dernières entrées</string>
+    <string name="entry_date">Date</string>
+
+</resources>
