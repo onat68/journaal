@@ -73,6 +73,7 @@ class MainActivity : ComponentActivity() {
                             response.body?.string().toString().removeSurrounding("[", "]")
                         ).url
                         entriesList[i] = newEntry
+                        Log.d(TAG, "ICI" + entriesList[i]?.imageUrl)
                     }
                     catch(e: Exception) {
                         e.printStackTrace()
@@ -83,29 +84,31 @@ class MainActivity : ComponentActivity() {
 
         }
 
+        val db = FirebaseDatabase.getInstance().getReference("entries")
+
+        db.get().addOnSuccessListener { databaseSnapshot ->
+            var count = 0
+            for (e in databaseSnapshot.children) {
+                val entry = e.getValue(EntryModel::class.java)
+                entriesList.add(entry)
+            }
+            entriesList.sortWith(compareBy({ it?.year }, { it?.month }, { it?.day }))
+            entriesList.reverse()
+            for (i in entriesList.indices){
+                run(
+                    "https://api.thecatapi.com/v1/images/search?api_key=live_KRAgyaK4kDT8bmL6CpwExbchFaVMDYSNiOCA1eHv2Te7kiFz5S8tikKabqj9H5NA",
+                    i,
+                    entriesList[i]!!
+                )
+            }
+        }
+
 
         setContent {
 
 
-            val db = FirebaseDatabase.getInstance().getReference("entries")
 
 
-            db.get().addOnSuccessListener { databaseSnapshot ->
-                var count = 0
-                for (e in databaseSnapshot.children) {
-                    val entry = e.getValue(EntryModel::class.java)
-                    entriesList.add(entry)
-                }
-                entriesList.sortWith(compareBy({ it?.year }, { it?.month }, { it?.day }))
-                entriesList.reverse()
-                for (i in entriesList.indices){
-                    run(
-                        "https://api.thecatapi.com/v1/images/search?api_key=live_KRAgyaK4kDT8bmL6CpwExbchFaVMDYSNiOCA1eHv2Te7kiFz5S8tikKabqj9H5NA",
-                        i,
-                        entriesList[i]!!
-                    )
-                }
-            }
             Column {
                 LastEntries()
                 Spacer(modifier = Modifier.height(30.dp))
