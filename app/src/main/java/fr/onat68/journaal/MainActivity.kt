@@ -53,7 +53,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         var entriesList = mutableStateListOf<EntryModel?>()
-        var compositionList = mutableStateListOf<EntryModel?>()
 
         @Serializable
         data class CatApiModel(var url: String)
@@ -67,21 +66,15 @@ class MainActivity : ComponentActivity() {
             client.newCall(request).enqueue(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {}
                 override fun onResponse(call: Call, response: Response) {
-                    try {
+                    try{
                         newEntry.imageUrl = Json {
                             ignoreUnknownKeys = true
                         }.decodeFromString<CatApiModel>(
                             response.body?.string().toString().removeSurrounding("[", "]")
                         ).url
                         entriesList[i] = newEntry
-                        compositionList = entriesList.sortedWith(
-                            compareBy({ it?.year },
-                                { it?.month },
-                                { it?.day })
-                        ).toMutableStateList()
-                        compositionList.reverse()
-                        Log.d(TAG, "ICI" + entriesList[i]?.imageUrl)
-                    } catch (e: Exception) {
+                    }
+                    catch(e: Exception) {
                         e.printStackTrace()
                         Log.d(TAG, "ICI")
                     }
@@ -90,31 +83,33 @@ class MainActivity : ComponentActivity() {
 
         }
 
-        val db = FirebaseDatabase.getInstance().getReference("entries")
-
-        db.get().addOnSuccessListener { databaseSnapshot ->
-            var count = 0
-            for (e in databaseSnapshot.children) {
-                val entry = e.getValue(EntryModel::class.java)
-                entriesList.add(entry)
-                run(
-                    "https://api.thecatapi.com/v1/images/search?api_key=live_KRAgyaK4kDT8bmL6CpwExbchFaVMDYSNiOCA1eHv2Te7kiFz5S8tikKabqj9H5NA",
-                    count,
-                    entriesList[count]!!
-                )
-                count += 1
-            }
-        }
-
-
 
         setContent {
 
 
+            val db = FirebaseDatabase.getInstance().getReference("entries")
+
+
+            db.get().addOnSuccessListener { databaseSnapshot ->
+                var count = 0
+                for (e in databaseSnapshot.children) {
+                    val entry = e.getValue(EntryModel::class.java)
+                    entriesList.add(entry)
+                }
+                entriesList.sortWith(compareBy({ it?.year }, { it?.month }, { it?.day }))
+                entriesList.reverse()
+                for (i in entriesList.indices){
+                    run(
+                        "https://api.thecatapi.com/v1/images/search?api_key=live_KRAgyaK4kDT8bmL6CpwExbchFaVMDYSNiOCA1eHv2Te7kiFz5S8tikKabqj9H5NA",
+                        i,
+                        entriesList[i]!!
+                    )
+                }
+            }
             Column {
                 LastEntries()
                 Spacer(modifier = Modifier.height(30.dp))
-                EntriesList(context, compositionList)
+                EntriesList(context, entriesList)
             }
         }
 
