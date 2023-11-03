@@ -34,10 +34,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import coil.compose.AsyncImage
 import com.google.firebase.database.FirebaseDatabase
 import okhttp3.Call
@@ -73,8 +75,11 @@ class MainActivity : ComponentActivity() {
                             EntriesList(viewModel.entriesList, navController)
                         }
                     }
-                    composable("details") {
-                        Text("Hey")
+                    composable("details/{entryPersonnal}",
+                        arguments = listOf(navArgument("entryPersonnal"){
+                            type = NavType.StringType
+                        })) {
+                        Text(it.arguments?.getString("entryPersonnal") ?: "")
                     }
                 }
             }
@@ -119,7 +124,7 @@ fun EntriesList(entriesList: SnapshotStateList<EntryModel?>, navController: NavC
 
 @Composable
 fun EntryCard(entry: EntryModel, navController: NavController) {
-    Button(onClick = { navController.navigate("details") }) {
+    Button(onClick = { navController.navigate("details/${entry.personnal}") }) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             EntryImage(entry)
             Spacer(modifier = Modifier.width(5.dp))
