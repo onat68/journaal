@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
@@ -58,8 +59,9 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("UnrememberedMutableState")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val entriesList = mutableStateListOf<EntryModel?>()
+        var entriesList = mutableStateListOf<EntryModel?>()
         val client = OkHttpClient()
+
         @Serializable
         data class CatApiModel(val url: String)
 
@@ -81,7 +83,6 @@ class MainActivity : ComponentActivity() {
                         entriesList[i] = newEntry
                     } catch (e: Exception) {
                         e.printStackTrace()
-                        Log.d(ContentValues.TAG, "ICI")
                     }
                 }
             })
@@ -90,10 +91,15 @@ class MainActivity : ComponentActivity() {
 
         val db = FirebaseDatabase.getInstance().getReference("entries")
 
-        fun fetchData(){
+        fun fetchData() {
             entriesList.clear()
             db.get().addOnSuccessListener { databaseSnapshot ->
-                for (e in databaseSnapshot.children) {
+                val sortedDB = databaseSnapshot.children.sortedWith(
+                    compareBy({ (it as? EntryModel)?.year },
+                        { (it as? EntryModel)?.month },
+                        { (it as? EntryModel)?.day })
+                ).reversed()
+                for (e in sortedDB) {
                     val entry = e.getValue(EntryModel::class.java)
                     entriesList.add(entry)
                     run(
@@ -123,11 +129,13 @@ class MainActivity : ComponentActivity() {
                             EntriesList(entriesList, navController)
                         }
                     }
-                    composable("details/{entry}",
-                        arguments = listOf(navArgument("entry"){
-                            type = NavType.ParcelableType(EntryModel::class.java)
-                        })) {
-                        Text(it.arguments?.getString("entry") ?: "")
+                    composable("details/{entryIndex}",
+                        arguments = listOf(navArgument("entryIndex") {
+                            type = NavType.IntType
+                        })
+                    ) {
+                        var entryIndex = it.arguments?.getInt("entryIndex") ?: -1
+                        Text(entriesList[entryIndex]!!.personnal)
                     }
                 }
             }
@@ -154,16 +162,16 @@ fun LastEntries() {
 fun EntriesList(entriesList: SnapshotStateList<EntryModel?>, navController: NavController) {
 
     LazyColumn {
-        items(
-            entriesList.sortedWith(compareBy({ it?.year }, { it?.month }, { it?.day })).reversed()
-        ) { entry ->
+        itemsIndexed(
+            entriesList
+        ) { index, entry ->
             Spacer(modifier = Modifier.height(5.dp))
             Box(
                 Modifier
                     .background(Color.Gray)
                     .width(600.dp)
             ) {
-                EntryCard(entry!!, navController)
+                EntryCard(entry!!, index, navController)
                 Spacer(modifier = Modifier.height(5.dp))
             }
         }
@@ -171,8 +179,8 @@ fun EntriesList(entriesList: SnapshotStateList<EntryModel?>, navController: NavC
 }
 
 @Composable
-fun EntryCard(entry: EntryModel, navController: NavController) {
-    Button(onClick = { navController.navigate("details/${entry.personnal}") }) {
+fun EntryCard(entry: EntryModel, entryIndex: Int, navController: NavController) {
+    Button(onClick = { navController.navigate("details/${entryIndex}") }) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             EntryImage(entry)
             Spacer(modifier = Modifier.width(5.dp))

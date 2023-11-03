@@ -2,7 +2,6 @@ package fr.onat68.journaal
 
 import kotlinx.serialization.Serializable
 
-@Serializable
 class EntryModel(
     val id: String = "firstEntry",
     val day: Int = 20,
