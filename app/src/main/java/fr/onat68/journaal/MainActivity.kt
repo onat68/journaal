@@ -59,14 +59,13 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("UnrememberedMutableState")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        var entriesList = mutableStateListOf<EntryModel?>()
+        val entriesList = mutableStateListOf<EntryModel?>()
         val client = OkHttpClient()
 
         @Serializable
         data class CatApiModel(val url: String)
 
-        fun run(url: String, i: Int, entry: EntryModel) {
-            val newEntry = entry
+        fun run(url: String, i: Int) {
 
             val request = Request.Builder()
                 .url(url)
@@ -75,12 +74,12 @@ class MainActivity : ComponentActivity() {
                 override fun onFailure(call: Call, e: IOException) {}
                 override fun onResponse(call: Call, response: Response) {
                     try {
-                        newEntry.imageUrl = Json {
+                        val newUrl = Json {
                             ignoreUnknownKeys = true
                         }.decodeFromString<CatApiModel>(
                             response.body?.string().toString().removeSurrounding("[", "]")
                         ).url
-                        entriesList[i] = newEntry
+                        entriesList[i] = entriesList[i]?.copy(imageUrl = newUrl)
                     } catch (e: Exception) {
                         e.printStackTrace()
                     }
@@ -104,8 +103,7 @@ class MainActivity : ComponentActivity() {
                     entriesList.add(entry)
                     run(
                         "https://api.thecatapi.com/v1/images/search?api_key=live_KRAgyaK4kDT8bmL6CpwExbchFaVMDYSNiOCA1eHv2Te7kiFz5S8tikKabqj9H5NA",
-                        entriesList.size - 1,
-                        entry!!
+                        entriesList.size - 1
                     )
                 }
                 entriesList.sortWith(compareBy({ it?.year }, { it?.month }, { it?.day }))
@@ -129,7 +127,8 @@ class MainActivity : ComponentActivity() {
                             EntriesList(entriesList, navController)
                         }
                     }
-                    composable("details/{entryIndex}",
+                    composable(
+                        "details/{entryIndex}",
                         arguments = listOf(navArgument("entryIndex") {
                             type = NavType.IntType
                         })
@@ -163,7 +162,7 @@ fun EntriesList(entriesList: SnapshotStateList<EntryModel?>, navController: NavC
 
     LazyColumn {
         itemsIndexed(
-            entriesList
+            entriesList //.sortedWith(compareBy({ it?.year }, { it?.month }, { it?.day })).reversed()
         ) { index, entry ->
             Spacer(modifier = Modifier.height(5.dp))
             Box(
