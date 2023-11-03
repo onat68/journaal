@@ -55,6 +55,7 @@ import kotlinx.serialization.json.Json
 
 
 class MainActivity : ComponentActivity() {
+    var context = this
 
     @SuppressLint("UnrememberedMutableState")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -106,8 +107,6 @@ class MainActivity : ComponentActivity() {
                         entriesList.size - 1
                     )
                 }
-                entriesList.sortWith(compareBy({ it?.year }, { it?.month }, { it?.day }))
-                entriesList.reverse()
             }
         }
         fetchData()
@@ -134,7 +133,7 @@ class MainActivity : ComponentActivity() {
                         })
                     ) {
                         var entryIndex = it.arguments?.getInt("entryIndex") ?: -1
-                        Text(entriesList[entryIndex]!!.personnal)
+                        CardDetails(entriesList[entryIndex]!!)
                     }
                 }
             }
@@ -162,7 +161,7 @@ fun EntriesList(entriesList: SnapshotStateList<EntryModel?>, navController: NavC
 
     LazyColumn {
         itemsIndexed(
-            entriesList //.sortedWith(compareBy({ it?.year }, { it?.month }, { it?.day })).reversed()
+            entriesList
         ) { index, entry ->
             Spacer(modifier = Modifier.height(5.dp))
             Box(
@@ -192,7 +191,7 @@ fun EntryCard(entry: EntryModel, entryIndex: Int, navController: NavController) 
 //@Preview
 //@Composable
 //fun PreviewEntryCard() {
-//    EntryCard(EntryModel())
+//    EntryCard(EntryModel(), 1, navController = NavController(context))
 //}
 
 @Composable
@@ -212,6 +211,15 @@ fun EntryText(entry: EntryModel) {
     Column(modifier = Modifier.padding(all = 8.dp)) {
         Text("${entry.day} ${entry.month} ${entry.year}")
         Spacer(modifier = Modifier.height(6.dp))
+    }
+}
+
+@Composable
+fun CardDetails(entry: EntryModel){
+    Column(modifier = Modifier.padding(all = 8.dp)) {
+        Text("Note personnelle : " + entry.personnal)
+        Spacer(modifier = Modifier.height(6.dp))
+        Text("Note professionnelle : " + entry.professionnal)
     }
 }
 
