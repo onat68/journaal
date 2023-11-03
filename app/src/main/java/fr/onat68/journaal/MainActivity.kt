@@ -1,6 +1,7 @@
 package fr.onat68.journaal
 
 import android.annotation.SuppressLint
+import android.content.ContentValues
 import android.content.ContentValues.TAG
 import android.os.Bundle
 import android.util.Log
@@ -57,6 +58,55 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("UnrememberedMutableState")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val entriesList = mutableStateListOf<EntryModel?>()
+        val client = OkHttpClient()
+        @Serializable
+        data class CatApiModel(val url: String)
+
+        fun run(url: String, i: Int, entry: EntryModel) {
+            val newEntry = entry
+
+            val request = Request.Builder()
+                .url(url)
+                .build()
+            client.newCall(request).enqueue(object : Callback {
+                override fun onFailure(call: Call, e: IOException) {}
+                override fun onResponse(call: Call, response: Response) {
+                    try {
+                        newEntry.imageUrl = Json {
+                            ignoreUnknownKeys = true
+                        }.decodeFromString<CatApiModel>(
+                            response.body?.string().toString().removeSurrounding("[", "]")
+                        ).url
+                        entriesList[i] = newEntry
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        Log.d(ContentValues.TAG, "ICI")
+                    }
+                }
+            })
+
+        }
+
+        val db = FirebaseDatabase.getInstance().getReference("entries")
+
+        fun fetchData(){
+            entriesList.clear()
+            db.get().addOnSuccessListener { databaseSnapshot ->
+                for (e in databaseSnapshot.children) {
+                    val entry = e.getValue(EntryModel::class.java)
+                    entriesList.add(entry)
+                    run(
+                        "https://api.thecatapi.com/v1/images/search?api_key=live_KRAgyaK4kDT8bmL6CpwExbchFaVMDYSNiOCA1eHv2Te7kiFz5S8tikKabqj9H5NA",
+                        entriesList.size - 1,
+                        entry!!
+                    )
+                }
+                entriesList.sortWith(compareBy({ it?.year }, { it?.month }, { it?.day }))
+                entriesList.reverse()
+            }
+        }
+        fetchData()
 
         setContent {
 
@@ -67,19 +117,17 @@ class MainActivity : ComponentActivity() {
                     route = "lastEntries"
                 ) {
                     composable("entries") {
-                        val viewModel = it.sharedViewModel<SampleViewModel>(navController)
-                        viewModel.fetchData()
                         Column {
                             LastEntries()
                             Spacer(modifier = Modifier.height(30.dp))
-                            EntriesList(viewModel.entriesList, navController)
+                            EntriesList(entriesList, navController)
                         }
                     }
-                    composable("details/{entryPersonnal}",
-                        arguments = listOf(navArgument("entryPersonnal"){
-                            type = NavType.StringType
+                    composable("details/{entry}",
+                        arguments = listOf(navArgument("entry"){
+                            type = NavType.ParcelableType(EntryModel::class.java)
                         })) {
-                        Text(it.arguments?.getString("entryPersonnal") ?: "")
+                        Text(it.arguments?.getString("entry") ?: "")
                     }
                 }
             }
