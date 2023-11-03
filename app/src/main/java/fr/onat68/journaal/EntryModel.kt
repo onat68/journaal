@@ -1,14 +1,21 @@
 package fr.onat68.journaal
 
-import java.text.SimpleDateFormat
-import java.util.Date
-
 class EntryModel(
-    var id: String = "firstEntry",
-    var day: Int = 20,
-    var month: Int = 10,
-    var year: Int = 2023,
-    var personnal: String = "Hey",
-    var professionnal: String = "Hoy",
+    val id: String = "firstEntry",
+    val day: Int = 20,
+    val month: Int = 10,
+    val year: Int = 2023,
+    val personnal: String = "Hey",
+    val professionnal: String = "Hoy",
     var imageUrl: String = "https://http.cat/images/400.jpg"
 )
+
+//data class EntryModel(
+//    val id: String,
+//    val day: Int,
+//    val month: Int,
+//    val year: Int,
+//    val personnal: String,
+//    val professionnal: String,
+//    var imageUrl: String = "https://http.cat/images/400.jpg"
+//)
