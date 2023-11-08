@@ -7,6 +7,8 @@ import json
 import docx2txt
 import re
 
+# test
+
 journal = docx2txt.process("journal.docx").split('*-*')
 if len(journal) > 1:
     journal.pop(0)
