@@ -5,13 +5,16 @@ import android.content.ContentValues
 import android.content.ContentValues.TAG
 import android.os.Bundle
 import android.util.Log
+import android.widget.ScrollView
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -19,8 +22,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.AbsoluteCutCornerShape
+import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.Composable
@@ -163,11 +171,19 @@ fun EntriesList(entriesList: SnapshotStateList<EntryModel?>, navController: NavC
         itemsIndexed(
             entriesList
         ) { index, entry ->
+//            val hue: Float = (index*240)/(entriesList.size.toFloat())
             Spacer(modifier = Modifier.height(5.dp))
             Box(
                 Modifier
-                    .background(Color.Gray)
+                    .background(
+                        Color.hsv(
+                            hue = (index * 240) / (entriesList.size.toFloat()),
+                            saturation = 0.2f,
+                            value = 1f
+                        )
+                    )
                     .width(600.dp)
+                    .clickable(onClick = { navController.navigate("details/${index}") })
             ) {
                 EntryCard(entry!!, index, navController)
                 Spacer(modifier = Modifier.height(5.dp))
@@ -178,14 +194,11 @@ fun EntriesList(entriesList: SnapshotStateList<EntryModel?>, navController: NavC
 
 @Composable
 fun EntryCard(entry: EntryModel, entryIndex: Int, navController: NavController) {
-    Button(onClick = { navController.navigate("details/${entryIndex}") }) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            EntryImage(entry)
-            Spacer(modifier = Modifier.width(5.dp))
-            EntryText(entry)
-        }
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        EntryImage(entry)
+        Spacer(modifier = Modifier.width(6.dp))
+        EntryText(entry)
     }
-
 }
 
 //@Preview
@@ -215,8 +228,13 @@ fun EntryText(entry: EntryModel) {
 }
 
 @Composable
-fun CardDetails(entry: EntryModel){
-    Column(modifier = Modifier.padding(all = 8.dp)) {
+fun CardDetails(entry: EntryModel) {
+
+    Column(
+        modifier = Modifier
+            .padding(all = 8.dp)
+            .verticalScroll(rememberScrollState())
+    ) {
         Text("Note personnelle : " + entry.personnal)
         Spacer(modifier = Modifier.height(6.dp))
         Text("Note professionnelle : " + entry.professionnal)
