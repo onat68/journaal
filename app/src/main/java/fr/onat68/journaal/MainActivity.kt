@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -28,6 +29,8 @@ import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -135,13 +138,14 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                     composable(
-                        "details/{entryIndex}",
+                        "details/{entryIndex}/{entryHue}",
                         arguments = listOf(navArgument("entryIndex") {
                             type = NavType.IntType
-                        })
+                        }, navArgument("entryHue") { type = NavType.FloatType })
                     ) {
-                        var entryIndex = it.arguments?.getInt("entryIndex") ?: -1
-                        CardDetails(entriesList[entryIndex]!!)
+                        val entryIndex = it.arguments?.getInt("entryIndex") ?: -1
+                        val entryHue = it.arguments?.getFloat("entryHue")
+                        CardDetails(entriesList[entryIndex]!!, entryHue!!)
                     }
                 }
             }
@@ -161,7 +165,7 @@ inline fun <reified T : ViewModel> NavBackStackEntry.sharedViewModel(navControll
 
 @Composable
 fun LastEntries() {
-    Text(text = "Dernières entrées dans le journal")
+    Text(text = "Dernières entrées dans le journal", )
 }
 
 @Composable
@@ -171,19 +175,19 @@ fun EntriesList(entriesList: SnapshotStateList<EntryModel?>, navController: NavC
         itemsIndexed(
             entriesList
         ) { index, entry ->
-//            val hue: Float = (index*240)/(entriesList.size.toFloat())
+            val hue: Float = (index * 240) / (entriesList.size.toFloat())
             Spacer(modifier = Modifier.height(5.dp))
             Box(
                 Modifier
                     .background(
                         Color.hsv(
-                            hue = (index * 240) / (entriesList.size.toFloat()),
+                            hue = hue,
                             saturation = 0.2f,
                             value = 1f
                         )
                     )
                     .width(600.dp)
-                    .clickable(onClick = { navController.navigate("details/${index}") })
+                    .clickable(onClick = { navController.navigate("details/${index}/${hue}") })
             ) {
                 EntryCard(entry!!, index, navController)
                 Spacer(modifier = Modifier.height(5.dp))
@@ -228,17 +232,28 @@ fun EntryText(entry: EntryModel) {
 }
 
 @Composable
-fun CardDetails(entry: EntryModel) {
-
-    Column(
-        modifier = Modifier
-            .padding(all = 8.dp)
-            .verticalScroll(rememberScrollState())
+fun CardDetails(entry: EntryModel, hue: Float) {
+    Card(
+        modifier = Modifier.fillMaxSize(),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.hsv(
+                hue = hue,
+                saturation = 0.08f,
+                value = 1f
+            )
+        )
     ) {
-        Text("Note personnelle : " + entry.personnal)
-        Spacer(modifier = Modifier.height(6.dp))
-        Text("Note professionnelle : " + entry.professionnal)
+        Column(
+            modifier = Modifier
+                .padding(all = 8.dp)
+                .verticalScroll(rememberScrollState())
+        ) {
+            Text("Note personnelle : " + entry.personnal)
+            Spacer(modifier = Modifier.height(6.dp))
+            Text("Note professionnelle : " + entry.professionnal)
+        }
     }
+
 }
 
 
