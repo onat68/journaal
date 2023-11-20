@@ -55,7 +55,6 @@ class EntriesRepository {
     }
 
     val client = OkHttpClient()
-
     @Serializable
     private data class CatApiModel(val url: String)
 
