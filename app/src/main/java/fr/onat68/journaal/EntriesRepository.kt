@@ -27,10 +27,12 @@ class EntriesRepository {
         val entriesList = mutableStateListOf<EntryModel?>()
     }
 
-    fun get() {
+
+    fun set() {
         entriesList.clear()
         databaseRef.get().addOnSuccessListener { databaseSnapshot ->
-                val sortedDB = databaseSnapshot.children.sortedWith(
+            Log.d(TAG, "ICI" + databaseSnapshot)
+            val sortedDB = databaseSnapshot.children.sortedWith(
                     compareBy({ (it as? EntryModel)?.year },
                         { (it as? EntryModel)?.month },
                         { (it as? EntryModel)?.day })

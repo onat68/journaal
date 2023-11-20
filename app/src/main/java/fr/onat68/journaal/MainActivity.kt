@@ -53,57 +53,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val repo = EntriesRepository()
-        repo.get()
-//        val entriesList = mutableStateListOf<EntryModel?>()
-//        val client = OkHttpClient()
-//
-//        @Serializable
-//        data class CatApiModel(val url: String)
-//
-//        fun getCatImage(url: String, i: Int) {
-//
-//            val request = Request.Builder()
-//                .url(url)
-//                .build()
-//            client.newCall(request).enqueue(object : Callback {
-//                override fun onFailure(call: Call, e: IOException) {}
-//                override fun onResponse(call: Call, response: Response) {
-//                    try {
-//                        val newUrl = Json {
-//                            ignoreUnknownKeys = true
-//                        }.decodeFromString<CatApiModel>(
-//                            response.body?.string().toString().removeSurrounding("[", "]")
-//                        ).url
-//                        entriesList[i] = entriesList[i]?.copy(imageUrl = newUrl)
-//                    } catch (e: Exception) {
-//                        e.printStackTrace()
-//                    }
-//                }
-//            })
-//
-//        }
-//
-//        val db = FirebaseDatabase.getInstance().getReference("entries")
-//
-//        fun fetchData() {
-//            entriesList.clear()
-//            db.get().addOnSuccessListener { databaseSnapshot ->
-//                val sortedDB = databaseSnapshot.children.sortedWith(
-//                    compareBy({ (it as? EntryModel)?.year },
-//                        { (it as? EntryModel)?.month },
-//                        { (it as? EntryModel)?.day })
-//                ).reversed()
-//                for (e in sortedDB) {
-//                    val entry = e.getValue(EntryModel::class.java)
-//                    entriesList.add(entry)
-//                    getCatImage(
-//                        "https://api.thecatapi.com/v1/images/search?api_key=live_KRAgyaK4kDT8bmL6CpwExbchFaVMDYSNiOCA1eHv2Te7kiFz5S8tikKabqj9H5NA",
-//                        entriesList.size - 1
-//                    )
-//                }
-//            }
-//        }
-//        fetchData()
+        repo.set()
 
         setContent {
 
