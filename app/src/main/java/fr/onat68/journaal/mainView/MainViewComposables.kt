@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -42,16 +43,18 @@ inline fun <reified T : ViewModel> NavBackStackEntry.sharedViewModel(navControll
 }
 
 @Composable
-fun LastEntries() {
+fun LastEntries(navController: NavController) {
     Row(modifier = Modifier.height(50.dp)) {
         Text(
             text = "Dernières entrées dans le journal", modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxSize()
+//                .fillMaxWidth()
+//                .fillMaxSize()
                 .wrapContentSize(Alignment.Center)
         )
+        ElevatedButton(onClick = { navController.navigate("addEntry") }) {
+            Text("Ajouter une entrée")
+        }
     }
-
 }
 
 @Composable

@@ -10,11 +10,11 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import fr.onat68.journaal.EntriesRepository
 
 @Composable
-fun MainActivityScreen(navController: NavController, repo: EntriesRepository) {
+fun MainViewScreen(navController: NavController, repo: EntriesRepository) {
     val isLoading by EntriesRepository.Singleton.isLoading.collectAsState()
     val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = isLoading)
     Column {
-        LastEntries()
+        LastEntries(navController)
         SwipeRefresh(
             state = swipeRefreshState,
             onRefresh = {

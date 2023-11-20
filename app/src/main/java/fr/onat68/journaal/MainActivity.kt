@@ -13,7 +13,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import fr.onat68.journaal.EntriesRepository.Singleton.entriesList
-import fr.onat68.journaal.mainView.MainActivityScreen
+import fr.onat68.journaal.mainView.MainViewScreen
+import fr.onat68.journaal.newEntry.NewEntryScreen
 import fr.onat68.journaal.readEntry.CardDetails
 
 
@@ -36,7 +37,7 @@ class MainActivity : ComponentActivity() {
                     route = "lastEntries"
                 ) {
                     composable("entries") {
-                        MainActivityScreen(navController, repo)
+                        MainViewScreen(navController, repo)
                     }
                     composable(
                         "details/{entryIndex}/{entryHue}",
@@ -47,6 +48,9 @@ class MainActivity : ComponentActivity() {
                         val entryIndex = it.arguments?.getInt("entryIndex") ?: -1
                         val entryHue = it.arguments?.getFloat("entryHue")
                         CardDetails(entriesList[entryIndex]!!, entryHue!!)
+                    }
+                    composable("addEntry") {
+                        NewEntryScreen()
                     }
                 }
             }
