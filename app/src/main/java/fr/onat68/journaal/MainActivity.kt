@@ -7,10 +7,14 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -66,7 +70,6 @@ class MainActivity : ComponentActivity() {
                     composable("entries") {
                         Column {
                             LastEntries()
-                            Spacer(modifier = Modifier.height(30.dp))
                             EntriesList(entriesList, navController)
                         }
                     }
@@ -98,8 +101,13 @@ inline fun <reified T : ViewModel> NavBackStackEntry.sharedViewModel(navControll
 
 @Composable
 fun LastEntries() {
-    Text(text = "Dernières entrées dans le journal",
-        modifier = Modifier.wrapContentSize(Alignment.Center))
+    Row(modifier = Modifier.height(50.dp)) {
+        Text(text = "Dernières entrées dans le journal", modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxSize()
+            .wrapContentSize(Alignment.Center))
+    }
+
 }
 
 @Composable
