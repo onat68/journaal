@@ -1,6 +1,7 @@
 package fr.onat68.journaal
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -47,6 +48,8 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import coil.compose.AsyncImage
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import fr.onat68.journaal.EntriesRepository.Singleton.entriesList
 
 
@@ -60,6 +63,8 @@ class MainActivity : ComponentActivity() {
         repo.set()
 
         setContent {
+            val isLoading by EntriesRepository.Singleton.isLoading.collectAsState()
+            val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = isLoading)
 
             val navController = rememberNavController()
             NavHost(navController = navController, startDestination = "lastEntries") {
@@ -70,7 +75,13 @@ class MainActivity : ComponentActivity() {
                     composable("entries") {
                         Column {
                             LastEntries()
-                            EntriesList(entriesList, navController)
+                            SwipeRefresh(
+                                state = swipeRefreshState,
+                                onRefresh = {
+                                    repo.set()
+                                }) {
+                                EntriesList(entriesList, navController)
+                            }
                         }
                     }
                     composable(
@@ -102,16 +113,19 @@ inline fun <reified T : ViewModel> NavBackStackEntry.sharedViewModel(navControll
 @Composable
 fun LastEntries() {
     Row(modifier = Modifier.height(50.dp)) {
-        Text(text = "Dernières entrées dans le journal", modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxSize()
-            .wrapContentSize(Alignment.Center))
+        Text(
+            text = "Dernières entrées dans le journal", modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxSize()
+                .wrapContentSize(Alignment.Center)
+        )
     }
 
 }
 
 @Composable
 fun EntriesList(entriesList: SnapshotStateList<EntryModel?>, navController: NavController) {
+
 
     LazyColumn {
         itemsIndexed(

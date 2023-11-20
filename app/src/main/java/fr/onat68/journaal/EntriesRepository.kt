@@ -9,6 +9,8 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import fr.onat68.journaal.EntriesRepository.Singleton.databaseRef
 import fr.onat68.journaal.EntriesRepository.Singleton.entriesList
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import okhttp3.Call
@@ -25,10 +27,13 @@ class EntriesRepository {
         //        val storageRef = FirebaseStorage.getInstance().getReferenceFromUrl(BUCKET_URL)
         val databaseRef = FirebaseDatabase.getInstance().getReference("entries")
         val entriesList = mutableStateListOf<EntryModel?>()
+        val _isLoading = MutableStateFlow(false)
+        val isLoading = _isLoading.asStateFlow()
     }
 
 
     fun set() {
+        Singleton._isLoading.value = true
         entriesList.clear()
         databaseRef.get().addOnSuccessListener { databaseSnapshot ->
             Log.d(TAG, "ICI" + databaseSnapshot)
@@ -45,8 +50,8 @@ class EntriesRepository {
                         entriesList.size - 1
                     )
                 }
-            Log.d(TAG, "ICI" + entriesList[0])
             }
+        Singleton._isLoading.value = false
     }
 
     val client = OkHttpClient()
