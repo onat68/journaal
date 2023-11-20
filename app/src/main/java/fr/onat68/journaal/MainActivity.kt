@@ -1,11 +1,7 @@
 package fr.onat68.journaal
 
 import android.annotation.SuppressLint
-import android.content.ContentValues
-import android.content.ContentValues.TAG
 import android.os.Bundle
-import android.util.Log
-import android.widget.ScrollView
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -15,33 +11,26 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.AbsoluteCutCornerShape
-import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -54,15 +43,7 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import coil.compose.AsyncImage
-import com.google.firebase.database.FirebaseDatabase
-import okhttp3.Call
-import okhttp3.Callback
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.Response
-import java.io.IOException
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
+import fr.onat68.journaal.EntriesRepository.Singleton.entriesList
 
 
 class MainActivity : ComponentActivity() {
@@ -71,56 +52,58 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("UnrememberedMutableState")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val entriesList = mutableStateListOf<EntryModel?>()
-        val client = OkHttpClient()
-
-        @Serializable
-        data class CatApiModel(val url: String)
-
-        fun run(url: String, i: Int) {
-
-            val request = Request.Builder()
-                .url(url)
-                .build()
-            client.newCall(request).enqueue(object : Callback {
-                override fun onFailure(call: Call, e: IOException) {}
-                override fun onResponse(call: Call, response: Response) {
-                    try {
-                        val newUrl = Json {
-                            ignoreUnknownKeys = true
-                        }.decodeFromString<CatApiModel>(
-                            response.body?.string().toString().removeSurrounding("[", "]")
-                        ).url
-                        entriesList[i] = entriesList[i]?.copy(imageUrl = newUrl)
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                }
-            })
-
-        }
-
-        val db = FirebaseDatabase.getInstance().getReference("entries")
-
-        fun fetchData() {
-            entriesList.clear()
-            db.get().addOnSuccessListener { databaseSnapshot ->
-                val sortedDB = databaseSnapshot.children.sortedWith(
-                    compareBy({ (it as? EntryModel)?.year },
-                        { (it as? EntryModel)?.month },
-                        { (it as? EntryModel)?.day })
-                ).reversed()
-                for (e in sortedDB) {
-                    val entry = e.getValue(EntryModel::class.java)
-                    entriesList.add(entry)
-                    run(
-                        "https://api.thecatapi.com/v1/images/search?api_key=live_KRAgyaK4kDT8bmL6CpwExbchFaVMDYSNiOCA1eHv2Te7kiFz5S8tikKabqj9H5NA",
-                        entriesList.size - 1
-                    )
-                }
-            }
-        }
-        fetchData()
+        val repo = EntriesRepository()
+        repo.get()
+//        val entriesList = mutableStateListOf<EntryModel?>()
+//        val client = OkHttpClient()
+//
+//        @Serializable
+//        data class CatApiModel(val url: String)
+//
+//        fun getCatImage(url: String, i: Int) {
+//
+//            val request = Request.Builder()
+//                .url(url)
+//                .build()
+//            client.newCall(request).enqueue(object : Callback {
+//                override fun onFailure(call: Call, e: IOException) {}
+//                override fun onResponse(call: Call, response: Response) {
+//                    try {
+//                        val newUrl = Json {
+//                            ignoreUnknownKeys = true
+//                        }.decodeFromString<CatApiModel>(
+//                            response.body?.string().toString().removeSurrounding("[", "]")
+//                        ).url
+//                        entriesList[i] = entriesList[i]?.copy(imageUrl = newUrl)
+//                    } catch (e: Exception) {
+//                        e.printStackTrace()
+//                    }
+//                }
+//            })
+//
+//        }
+//
+//        val db = FirebaseDatabase.getInstance().getReference("entries")
+//
+//        fun fetchData() {
+//            entriesList.clear()
+//            db.get().addOnSuccessListener { databaseSnapshot ->
+//                val sortedDB = databaseSnapshot.children.sortedWith(
+//                    compareBy({ (it as? EntryModel)?.year },
+//                        { (it as? EntryModel)?.month },
+//                        { (it as? EntryModel)?.day })
+//                ).reversed()
+//                for (e in sortedDB) {
+//                    val entry = e.getValue(EntryModel::class.java)
+//                    entriesList.add(entry)
+//                    getCatImage(
+//                        "https://api.thecatapi.com/v1/images/search?api_key=live_KRAgyaK4kDT8bmL6CpwExbchFaVMDYSNiOCA1eHv2Te7kiFz5S8tikKabqj9H5NA",
+//                        entriesList.size - 1
+//                    )
+//                }
+//            }
+//        }
+//        fetchData()
 
         setContent {
 
@@ -165,7 +148,8 @@ inline fun <reified T : ViewModel> NavBackStackEntry.sharedViewModel(navControll
 
 @Composable
 fun LastEntries() {
-    Text(text = "Dernières entrées dans le journal", )
+    Text(text = "Dernières entrées dans le journal",
+        modifier = Modifier.wrapContentSize(Alignment.Center))
 }
 
 @Composable
