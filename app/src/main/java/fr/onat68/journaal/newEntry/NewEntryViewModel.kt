@@ -1,26 +1,39 @@
 package fr.onat68.journaal.newEntry
 
 import android.annotation.SuppressLint
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
+import androidx.lifecycle.ViewModel
+import fr.onat68.journaal.EntriesRepository
 import fr.onat68.journaal.EntryModel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import java.time.LocalDate
 import java.util.UUID
 
 @SuppressLint("NewApi")
-class NewEntryViewModel() {
-
+class NewEntryViewModel : ViewModel() {
+    val repo = EntriesRepository()
     val date = LocalDate.now()
-    var newEntry = EntryModel(
-        id = UUID.randomUUID().toString(),
-        day = date.dayOfMonth,
-        month = date.monthValue,
-        year = date.year,
-        personnal = "",
-        professionnal = ""
+
+    private val _newEntry = MutableStateFlow(
+        EntryModel(
+            id = UUID.randomUUID().toString(),
+            day = date.dayOfMonth,
+            month = date.monthValue,
+            year = date.year
+        )
     )
+    val newEntry: Flow<EntryModel> = _newEntry
+
+    fun sendEntry(entry: EntryModel) {
+        repo.add(entry)
+        EntriesRepository.Singleton.entriesList.add(entry)
+    }
+
+    fun onNoteChange(note: String, type: String) {
+        when (type) {
+            "perso" -> _newEntry.value = _newEntry.value.copy(personnal = note)
+            "pro" -> _newEntry.value = _newEntry.value.copy(professionnal = note)
+        }
+    }
 
 }

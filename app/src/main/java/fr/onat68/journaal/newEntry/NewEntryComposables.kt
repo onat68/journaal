@@ -10,13 +10,17 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavController
 import com.google.type.Date
 import fr.onat68.journaal.EntriesRepository
+import fr.onat68.journaal.EntryModel
 import java.time.LocalDate
 import java.util.Calendar
 
@@ -26,32 +30,27 @@ fun DateField(newEntryViewModel: NewEntryViewModel) {
 }
 
 @Composable
-fun NotePerso(newEntryViewModel: NewEntryViewModel) {
-    var text by rememberSaveable { mutableStateOf(newEntryViewModel.newEntry.personnal) }
+fun NotePerso(
+    perso: String,
+    onNoteChange: (String, String) -> Unit,
+) {
     TextField(
-        value = text,
-        onValueChange = { it ->
-            newEntryViewModel.newEntry.personnal = it
-            text = it
-        },
+        value = perso,
+        onValueChange = {onNoteChange(it, "perso")},
         readOnly = false,
         placeholder = { Text("Note personnelle") },
         modifier = Modifier.fillMaxWidth()
     )
-}
-
-
-//
+}//
 
 @Composable
-fun NotePro(newEntryViewModel: NewEntryViewModel) {
-    var text by rememberSaveable { mutableStateOf(newEntryViewModel.newEntry.professionnal) }
+fun NotePro(
+    pro: String,
+    onNoteChange: (String, String) -> Unit,
+    ) {
     TextField(
-        value = text,
-        onValueChange = { it ->
-            newEntryViewModel.newEntry.professionnal = it
-            text = it
-        },
+        value = pro,
+        onValueChange = {onNoteChange(it, "pro")},
         readOnly = false,
         placeholder = { Text("Note professionnelle") },
         modifier = Modifier.fillMaxWidth()
@@ -59,9 +58,14 @@ fun NotePro(newEntryViewModel: NewEntryViewModel) {
 }
 
 @Composable
-fun SendButton(repo: EntriesRepository, newEntryViewModel: NewEntryViewModel) {
+fun SendButton(
+    sendEntry: (EntryModel) -> Unit,
+    newEntry: EntryModel,
+    navController: NavController
+) {
     Button(onClick = {
-        repo.add(newEntryViewModel.newEntry)
+        sendEntry(newEntry)
+        navController.navigate("entries")
     }){
         Text("Envoyer")
     }

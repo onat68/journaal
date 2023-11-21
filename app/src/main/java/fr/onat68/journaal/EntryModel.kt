@@ -5,8 +5,8 @@ data class EntryModel(
     val day: Int = 20,
     val month: Int = 10,
     val year: Int = 2023,
-    var personnal: String = "Hey",
-    var professionnal: String = "Hoy",
+    var personnal: String = "",
+    var professionnal: String = "",
     val imageUrl: String = "https://http.cat/images/400.jpg"
 )
 

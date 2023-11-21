@@ -52,7 +52,7 @@ class MainActivity : ComponentActivity() {
                     }
                     composable("addEntry") {
                         val newEntryViewModel = NewEntryViewModel()
-                        NewEntryScreen(repo, newEntryViewModel)
+                        NewEntryScreen(repo, newEntryViewModel, navController)
                     }
                 }
             }
