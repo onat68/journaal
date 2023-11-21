@@ -15,6 +15,7 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import fr.onat68.journaal.EntriesRepository.Singleton.entriesList
 import fr.onat68.journaal.mainView.MainViewScreen
 import fr.onat68.journaal.newEntry.NewEntryScreen
+import fr.onat68.journaal.newEntry.NewEntryViewModel
 import fr.onat68.journaal.readEntry.CardDetails
 
 
@@ -50,7 +51,8 @@ class MainActivity : ComponentActivity() {
                         CardDetails(entriesList[entryIndex]!!, entryHue!!)
                     }
                     composable("addEntry") {
-                        NewEntryScreen()
+                        val newEntryViewModel = NewEntryViewModel()
+                        NewEntryScreen(repo, newEntryViewModel)
                     }
                 }
             }

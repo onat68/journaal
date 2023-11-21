@@ -16,7 +16,10 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -49,10 +52,15 @@ fun LastEntries(navController: NavController) {
             text = "Dernières entrées dans le journal", modifier = Modifier
 //                .fillMaxWidth()
 //                .fillMaxSize()
+                .width(300.dp)
                 .wrapContentSize(Alignment.Center)
         )
         ElevatedButton(onClick = { navController.navigate("addEntry") }) {
-            Text("Ajouter une entrée")
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = "Favorite",
+                modifier = Modifier.size(20.dp)
+            )
         }
     }
 }

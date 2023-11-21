@@ -31,6 +31,9 @@ class EntriesRepository {
         val isLoading = _isLoading.asStateFlow()
     }
 
+    fun add(entry: EntryModel) {
+        databaseRef.child(entry.id).setValue(entry)
+    }
 
     fun set() {
         Singleton._isLoading.value = true
