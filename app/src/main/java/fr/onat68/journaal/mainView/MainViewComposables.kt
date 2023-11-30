@@ -147,8 +147,8 @@ fun EntryText(entry: EntryModel) {
 }
 
 @Composable
-fun DeleteEntry(entryId: String, repo: EntriesRepository, navController: NavController){
-    fun onDismissRequest(navController: NavController){
+fun DeleteEntry(entryId: String, repo: EntriesRepository, navController: NavController) {
+    fun onDismissRequest(navController: NavController) {
         navController.navigate("entries")
     }
     AlertDialog(
@@ -163,7 +163,7 @@ fun DeleteEntry(entryId: String, repo: EntriesRepository, navController: NavCont
             ) {
                 Text("Annuler")
             }
-             },
+        },
         confirmButton = {
             TextButton(
                 onClick = {
@@ -174,8 +174,7 @@ fun DeleteEntry(entryId: String, repo: EntriesRepository, navController: NavCont
             ) {
                 Text("Valider")
             }
-
-                        },
+        },
         title = {
             Text(text = "Supprimer l'entrée")
         },

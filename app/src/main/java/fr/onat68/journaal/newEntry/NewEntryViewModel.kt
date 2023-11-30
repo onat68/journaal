@@ -29,6 +29,7 @@ class NewEntryViewModel : ViewModel() {
     }
     fun sendEntry(entry: EntryModel) {
         repo.add(entry)
+        repo.set()
     }
 
     fun onNoteChange(note: String, type: String) {
