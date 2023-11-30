@@ -1,7 +1,10 @@
 package fr.onat68.journaal.mainView
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,6 +21,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -28,12 +32,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.material3.TextButton
 import coil.compose.AsyncImage
+import fr.onat68.journaal.EntriesRepository
 import fr.onat68.journaal.EntryModel
 
 @Composable
@@ -55,7 +64,7 @@ fun LastEntries(navController: NavController) {
                 .width(300.dp)
                 .wrapContentSize(Alignment.Center)
         )
-        ElevatedButton(onClick = { navController.navigate("addEntry") }) {
+        ElevatedButton(onClick = { navController.navigate("newEntry") }) {
             Icon(
                 imageVector = Icons.Default.Add,
                 contentDescription = "Favorite",
@@ -66,7 +75,7 @@ fun LastEntries(navController: NavController) {
 }
 
 @Composable
-fun EntriesList(entriesList: SnapshotStateList<EntryModel?>, navController: NavController) {
+fun EntriesList(entriesList: SnapshotStateList<EntryModel>, navController: NavController) {
 
 
     LazyColumn {
@@ -87,7 +96,7 @@ fun EntriesList(entriesList: SnapshotStateList<EntryModel?>, navController: NavC
                     .width(600.dp)
                     .clickable(onClick = { navController.navigate("details/${index}/${hue}") })
             ) {
-                EntryCard(entry!!, index, navController)
+                EntryCard(entry, navController)
                 Spacer(modifier = Modifier.height(5.dp))
             }
         }
@@ -95,8 +104,16 @@ fun EntriesList(entriesList: SnapshotStateList<EntryModel?>, navController: NavC
 }
 
 @Composable
-fun EntryCard(entry: EntryModel, entryIndex: Int, navController: NavController) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
+fun EntryCard(entry: EntryModel, navController: NavController) {
+    Row(verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.pointerInput(Unit) {
+            detectTapGestures(
+                onLongPress = {
+                    navController.navigate("deleteEntry/${entry.id}")
+//                    navController.navigate("newEntry")
+                }
+            )
+        }) {
         EntryImage(entry)
         Spacer(modifier = Modifier.width(6.dp))
         EntryText(entry)
@@ -127,4 +144,42 @@ fun EntryText(entry: EntryModel) {
         Text("${entry.day} ${entry.month} ${entry.year}")
         Spacer(modifier = Modifier.height(6.dp))
     }
+}
+
+@Composable
+fun DeleteEntry(entryId: String, repo: EntriesRepository, navController: NavController){
+    fun onDismissRequest(navController: NavController){
+        navController.navigate("entries")
+    }
+    AlertDialog(
+        onDismissRequest = {
+            onDismissRequest(navController)
+        },
+        dismissButton = {
+            TextButton(
+                onClick = {
+                    onDismissRequest(navController)
+                }
+            ) {
+                Text("Annuler")
+            }
+             },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    repo.delete(entryId)
+                    repo.set()
+                    navController.navigate("entries")
+                }
+            ) {
+                Text("Valider")
+            }
+
+                        },
+        title = {
+            Text(text = "Supprimer l'entrée")
+        },
+        text = {
+            Text(text = "Voulez vous supprimer l'entrée")
+        })
 }

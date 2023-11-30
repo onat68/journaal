@@ -11,9 +11,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import fr.onat68.journaal.EntriesRepository.Singleton.entriesList
+import fr.onat68.journaal.mainView.DeleteEntry
 import fr.onat68.journaal.mainView.MainViewScreen
+import fr.onat68.journaal.newEntry.ErrorEntry
 import fr.onat68.journaal.newEntry.NewEntryScreen
 import fr.onat68.journaal.newEntry.NewEntryViewModel
 import fr.onat68.journaal.readEntry.CardDetails
@@ -46,13 +47,23 @@ class MainActivity : ComponentActivity() {
                             type = NavType.IntType
                         }, navArgument("entryHue") { type = NavType.FloatType })
                     ) {
-                        val entryIndex = it.arguments?.getInt("entryIndex") ?: -1
-                        val entryHue = it.arguments?.getFloat("entryHue")
-                        CardDetails(entriesList[entryIndex]!!, entryHue!!)
+                        val entryIndex = it.arguments!!.getInt("entryIndex") ?: -1
+                        val entryHue = it.arguments!!.getFloat("entryHue")
+                        CardDetails(entriesList[entryIndex], entryHue)
                     }
-                    composable("addEntry") {
+                    composable("newEntry") {
                         val newEntryViewModel = NewEntryViewModel()
                         NewEntryScreen(repo, newEntryViewModel, navController)
+                    }
+                    composable("error_newEntry") {
+                        ErrorEntry(navController)
+                    }
+                    composable("deleteEntry/{entryId}",
+                        arguments = listOf(navArgument("entryId") {
+                            type = NavType.StringType
+                        })) {
+                        val entryId = it.arguments!!.getString("entryId")
+                        DeleteEntry(entryId!! , repo, navController)
                     }
                 }
             }

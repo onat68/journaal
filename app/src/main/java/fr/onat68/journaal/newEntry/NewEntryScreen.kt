@@ -15,7 +15,7 @@ fun NewEntryScreen(repo: EntriesRepository, newEntryViewModel: NewEntryViewModel
         DateField(newEntryViewModel)
         NotePerso(newEntry.value.personnal, newEntryViewModel::onNoteChange)
         NotePro(newEntry.value.professionnal, newEntryViewModel::onNoteChange)
-        SendButton(newEntryViewModel::sendEntry, newEntry.value, navController)
+        SendButton(newEntryViewModel::sendEntry, newEntryViewModel::checkEntry, newEntry.value, navController)
     }
 }
 

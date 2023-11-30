@@ -11,8 +11,8 @@ import java.util.UUID
 
 @SuppressLint("NewApi")
 class NewEntryViewModel : ViewModel() {
-    val repo = EntriesRepository()
-    val date = LocalDate.now()
+    private val repo = EntriesRepository()
+    val date: LocalDate = LocalDate.now()
 
     private val _newEntry = MutableStateFlow(
         EntryModel(
@@ -24,9 +24,11 @@ class NewEntryViewModel : ViewModel() {
     )
     val newEntry: Flow<EntryModel> = _newEntry
 
+    fun checkEntry(entry: EntryModel): Boolean {
+        return EntriesRepository.Singleton.entriesList.none { it.day == entry.day && it.month == entry.month && it.year == entry.year }
+    }
     fun sendEntry(entry: EntryModel) {
         repo.add(entry)
-        EntriesRepository.Singleton.entriesList.add(entry)
     }
 
     fun onNoteChange(note: String, type: String) {
