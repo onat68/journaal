@@ -18,7 +18,7 @@ L'idée est d'apprendre les bases de l'environnement Android, de la recompositio
 - Jetpack Compose et Material3 pour l'UI
 ## Objectif d'apprentissage
 
-- Apprendre un langage fortement typé et orienté objet comme Kotlin
+- Apprendre un langage typé et orienté objet comme Kotlin
 - Découvrir l'environnement Android
 - Comprendre la recomposition de composants avec Jetpack Compose
 - Mettre en place une architecture MVVM (ModelViewViewModel)
